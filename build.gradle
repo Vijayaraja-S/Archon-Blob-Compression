@@ -1,0 +1,29 @@
+plugins {
+    id 'java'
+}
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    implementation files('libs/ads-export-jar-plain.jar')
+    compileOnly 'org.projectlombok:lombok:1.18.22'
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.15.1'
+    implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.8'
+    implementation 'org.slf4j:slf4j-api:1.7.30'
+// https://mvnrepository.com/artifact/org.owasp.encoder/encoder
+    implementation group: 'org.owasp.encoder', name: 'encoder', version: '1.2.3'
+// Replace with the latest version
+
+}
+
+test {
+    useJUnitPlatform()
+}

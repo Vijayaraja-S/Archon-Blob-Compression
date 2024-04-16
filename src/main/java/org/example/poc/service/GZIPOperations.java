@@ -1,6 +1,7 @@
 package org.example.poc.service;
 
 import org.apache.commons.io.FilenameUtils;
+import org.example.poc.bean.CompressionTypes;
 import org.example.poc.bean.StackBean;
 import org.example.poc.utils.CommonUtils;
 
@@ -24,7 +25,7 @@ public class    GZIPOperations implements CompressionHandler {
     @Override
     public StackBean compress(String inputPath, String outputPath) throws IOException {
         long startTime = System.nanoTime();
-        outputPath=outputPath+File.separator+ FilenameUtils.getExtension(new File(inputPath).getName())+".gz";
+        outputPath=outputPath+File.separator+ FilenameUtils.removeExtension(new File(inputPath).getName())+".gz";
         byte[] buffer = new byte[1024];
         try {
             GZIPOutputStream os = new GZIPOutputStream(new FileOutputStream(outputPath));
@@ -36,7 +37,7 @@ public class    GZIPOperations implements CompressionHandler {
             in.close();
             os.finish();
             os.close();
-            return commonUtils.getStackBean(inputPath,outputPath,startTime);
+            return commonUtils.getStackBean(inputPath,outputPath,startTime, CompressionTypes.GZIP);
         }
         catch (IOException e) {
             throw new IOException(e.getMessage());
@@ -62,7 +63,7 @@ public class    GZIPOperations implements CompressionHandler {
             }
             out.close();
             is.close();
-            return commonUtils.getStackBean(inputPath,outputPath,startTime);
+            return commonUtils.getStackBean(inputPath,outputPath,startTime, CompressionTypes.GZIP);
         }
         catch (IOException e) {
             throw new IOException(e.getMessage());

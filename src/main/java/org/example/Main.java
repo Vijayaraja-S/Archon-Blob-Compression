@@ -4,24 +4,33 @@ import com.p3.ads.export.formatter.ExportFormat;
 import com.p3.ads.export.operation.ExportEngine;
 import com.p3.ads.export.options.ColumnInfo;
 import com.p3.ads.export.specifics.DataType;
+import org.apache.commons.io.FilenameUtils;
 import org.example.poc.bean.CompressionTypes;
 import org.example.poc.bean.StackBean;
 import org.example.poc.service.CompressionEngine;
+import org.example.poc.service.CompressionHandler;
 
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 public class Main {
 
-    static final String OUTPUT_PATH = "/home/vijayaraja/Music/Bloblist/sample/output";
     static final String INPUT_PATH = "/home/vijayaraja/Music/Bloblist/sample/blob";
+    static final String OUTPUT_PATH = "/home/vijayaraja/Music/Bloblist/sample/output";
     static final List<CompressionTypes> COMPRESSION_TYPES_LIST = Arrays.asList(CompressionTypes.values());
+    static final boolean isDeleteFile = true;
 
     public static void main(String[] args) throws Exception {
-        startCompression();
-    }
+        final ExportEngine ee = getExportEngine();
+        startCompression(ee);
+        ee.handleDataEnd();
+        ee.generateReport();
 
+    }
     private static ExportEngine getExportEngine() throws Exception {
         ExportEngine  ee = ExportEngine.builder()
                 .exportFormat(ExportFormat.csv)
@@ -33,28 +42,43 @@ public class Main {
         return ee;
     }
 
-    private static void startCompression() throws Exception {
-        for (CompressionTypes c : COMPRESSION_TYPES_LIST) {
-            final ExportEngine ee = getExportEngine();
-            CompressionEngine ce = new CompressionEngine(c);
-            ce.inti();
-            for (File file : Objects.requireNonNull(new File(INPUT_PATH).listFiles())) {
-                if (!file.isDirectory()) {
-                    StackBean cBean = ce.compress(file.getPath(), OUTPUT_PATH);
-                    StackBean dBean = ce.deCompress(cBean.getProcessedPath(), INPUT_PATH);
-                    ee.iterateRows(getResultRow(cBean,dBean,file,c));
-                }
-            }
-            ee.handleDataEnd();
-            ee.generateReport();
+    private static void startCompression(ExportEngine ee) throws Exception {
+        final List<CompressionHandler> compressionHandlers = getListOfCompressionHandler();
+        for (File file : Objects.requireNonNull(new File(INPUT_PATH).listFiles())) {
+            processCompression(ee, file, compressionHandlers);
         }
     }
 
-    private static List<Object> getResultRow(StackBean cBean, StackBean dBean, File file, CompressionTypes c) {
+    private static void processCompression(ExportEngine ee, File file, List<CompressionHandler> compressionHandlers)
+            throws Exception {
+        for (CompressionHandler ch : compressionHandlers) {
+            if (!file.isDirectory()) {
+                StackBean cBean = ch.compress(file.getPath(), OUTPUT_PATH);
+                StackBean dBean = ch.deCompress(cBean.getProcessedPath(), INPUT_PATH);
+                ee.iterateRows(getResultRow(cBean, dBean, file));
+                if (isDeleteFile) {
+                    deleteFiles(cBean.getProcessedPath());
+                    deleteFiles(dBean.getProcessedPath());
+                }
+            }
+        }
+    }
+
+    private static  List<CompressionHandler> getListOfCompressionHandler() {
+        final List<CompressionHandler> chs = new ArrayList<>();
+        for (CompressionTypes c : COMPRESSION_TYPES_LIST) {
+            CompressionEngine ce = new CompressionEngine(c);
+            chs.add(ce.inti());
+        }
+        return chs;
+    }
+
+    private static List<Object> getResultRow(StackBean cBean, StackBean dBean, File file) {
         List<Object> row = new LinkedList<>();
         row.add(file.getName());
+        row.add(FilenameUtils.getExtension(file.getAbsolutePath()));
         row.add(cBean.getActualSize());
-        row.add(c);
+        row.add(cBean.getCompressionType());
         row.add(cBean.getCompressionRatio());
         row.add(cBean.getProcessedSize());
         row.add(cBean.getTimeTaken());
@@ -67,6 +91,7 @@ public class Main {
         List<ColumnInfo>columnInfos= new ArrayList<>();
         final ArrayList<String> colNames= new ArrayList<>();
         colNames.add("FileName");
+        colNames.add("fileType");
         colNames.add("FileSize(KB)");
         colNames.add("Compression_type");
         colNames.add("Ratio_of_Compression");
@@ -86,4 +111,8 @@ public class Main {
         return columnInfos;
     }
 
+
+    private static void deleteFiles(String path) throws IOException {
+        Files.delete(Path.of(path));
+    }
 }

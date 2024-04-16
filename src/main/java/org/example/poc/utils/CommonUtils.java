@@ -1,5 +1,6 @@
 package org.example.poc.utils;
 
+import org.example.poc.bean.CompressionTypes;
 import org.example.poc.bean.StackBean;
 
 import java.io.File;
@@ -12,7 +13,7 @@ public class CommonUtils {
         return  (double) nanoSeconds/1_000_000_000;
     }
 
-    public StackBean getStackBean(String inputPath, String outputPath, long startTime) {
+    public StackBean getStackBean(String inputPath, String outputPath, long startTime, CompressionTypes c) {
         DecimalFormat decimalFormat = new DecimalFormat("#.###");
         final String actualSize = decimalFormat.format(new File(inputPath).length() / 1024.0);
         final String processedSize = decimalFormat.format(new File(outputPath).length() / 1024.0);
@@ -21,6 +22,7 @@ public class CommonUtils {
                 .actualSize(actualSize)
                 .processedPath(outputPath)
                 .processedSize(processedSize)
+                .compressionType(String.valueOf(c))
                 .timeTaken(Double.parseDouble(decimalFormat.
                         format(getSeconds(System.nanoTime() -startTime))))
                 .compressionRatio(Double.parseDouble(decimalFormat.

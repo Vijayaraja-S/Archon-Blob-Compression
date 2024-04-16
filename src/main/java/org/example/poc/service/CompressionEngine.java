@@ -1,11 +1,6 @@
 package org.example.poc.service;
 
 import org.example.poc.bean.CompressionTypes;
-import org.example.poc.bean.StackBean;
-
-import java.io.IOException;
-import java.util.zip.DataFormatException;
-
 
 
 public class CompressionEngine {
@@ -17,8 +12,9 @@ public class CompressionEngine {
         this.types = types;
     }
 
-    public void inti(){
+    public CompressionHandler inti(){
         this.ch = this.getCompressionEngine();
+        return ch;
     }
 
     public CompressionHandler getCompressionEngine(){
@@ -32,11 +28,11 @@ public class CompressionEngine {
         return null;
     }
 
-    public StackBean compress(String path, String outputPath) throws IOException {
-        return ch.compress(path,outputPath);
-    }
-
-    public StackBean deCompress(String processedPath, String inputPath) throws IOException, DataFormatException {
-        return ch.deCompress(processedPath,inputPath);
-    }
+//    public StackBean compress(String path, String outputPath) throws IOException {
+//        return ch.compress(path,outputPath);
+//    }
+//
+//    public StackBean deCompress(String processedPath, String inputPath) throws IOException, DataFormatException {
+//        return ch.deCompress(processedPath,inputPath);
+//    }
 }

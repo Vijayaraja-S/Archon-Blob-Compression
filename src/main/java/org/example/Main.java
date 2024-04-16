@@ -36,7 +36,8 @@ public class Main {
     private static void startCompression() throws Exception {
         for (CompressionTypes c : COMPRESSION_TYPES_LIST) {
             final ExportEngine ee = getExportEngine();
-            CompressionHandler ce = new CompressionEngine(c).getCompressionEngine();
+            CompressionEngine ce = new CompressionEngine(c);
+            ce.inti();
             for (File file : Objects.requireNonNull(new File(INPUT_PATH).listFiles())) {
                 if (!file.isDirectory()) {
                     StackBean cBean = ce.compress(file.getPath(), OUTPUT_PATH);

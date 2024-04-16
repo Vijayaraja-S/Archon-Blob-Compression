@@ -1,7 +1,8 @@
 package org.example.poc.bean;
 
 public enum CompressionTypes {
-    GZIP("gzip");
+    GZIP("gzip"),
+    DEFLATE("deflate");
     private final String value;
 
     CompressionTypes(String value) {

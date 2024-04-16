@@ -16,7 +16,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 
-public class GZIPOperations implements CompressionHandler {
+public class    GZIPOperations implements CompressionHandler {
 
     private final CommonUtils commonUtils = new CommonUtils();
 

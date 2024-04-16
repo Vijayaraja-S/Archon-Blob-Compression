@@ -27,8 +27,6 @@ public class CompressionEngine {
                 return new GZIPOperations();
             case DEFLATE:
                 return new DeflateOperations();
-
-
         }
 
         return null;
